@@ -6,6 +6,16 @@ type Config struct {
 	Postgres struct {
 		URL string `toml:"url"`
 	} `toml:"postgres"`
+
+	Server struct {
+		Addr string `toml:"addr"`
+		Mode string `toml:"mode"`
+	} `toml:"server"`
+
+	Log struct {
+		Level string `toml:"level"`
+		Path  string `toml:"path"`
+	} `toml:"log"`
 }
 
 var Cfg = new(Config)

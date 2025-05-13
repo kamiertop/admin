@@ -1,12 +1,14 @@
 package main
 
 import (
-	"backend/config"
-	"backend/storage"
 	"flag"
+
+	"backend/config"
+	"backend/router"
+	"backend/storage"
 )
 
-func init() {
+func main() {
 	configPath := flag.String("config", "config.toml", "config file path, default is .")
 	flag.Parse()
 
@@ -17,8 +19,8 @@ func init() {
 	if err := storage.InitPostgres(cfg.Postgres.URL); err != nil {
 		panic(err)
 	}
-}
 
-func main() {
-
+	if err := router.Serve(cfg.Server.Addr); err != nil {
+		panic(err)
+	}
 }
