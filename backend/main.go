@@ -1,9 +1,20 @@
 package main
 
-import "backend/pkg/storage"
+import (
+	"backend/config"
+	"backend/storage"
+	"flag"
+)
 
 func init() {
-	if err := storage.InitPostgres("postgres://xl:xl@192.168.1.208:5432/xl"); err != nil {
+	configPath := flag.String("config", "config.toml", "config file path, default is .")
+	flag.Parse()
+
+	cfg, err := config.Init(*configPath)
+	if err != nil {
+		panic(err)
+	}
+	if err := storage.InitPostgres(cfg.Postgres.URL); err != nil {
 		panic(err)
 	}
 }
