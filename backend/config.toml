@@ -1,5 +1,5 @@
 [postgres]
-url = "postgres://xl:xl@192.168.1.208:5432/xl"
+url = "postgres://xl:xl@192.168.1.208:5432/xl?search_path=public"
 
 [server]
 addr = ":8080"

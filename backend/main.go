@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 
+	"backend/api/router"
 	"backend/config"
-	"backend/router"
-	"backend/storage"
+	"backend/dal/db"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if err := storage.InitPostgres(cfg.Postgres.URL); err != nil {
+	if err := db.InitPostgres(cfg.Postgres.URL); err != nil {
 		panic(err)
 	}
 
