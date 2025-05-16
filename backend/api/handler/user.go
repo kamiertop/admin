@@ -2,6 +2,7 @@ package handler
 
 import (
 	"backend/api/service"
+	"backend/dal/model"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -28,6 +29,17 @@ func (u User) Delete(ctx fiber.Ctx) error {
 	return nil
 }
 
-func (User) Create(ctx fiber.Ctx) error {
-	return nil
+func (u User) Create(ctx fiber.Ctx) error {
+	var user model.User
+	if err := ctx.Bind().JSON(&user); err != nil {
+		return err
+	}
+	id, err := u.Service.Create(ctx.Context(), user)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"id": id,
+	})
 }

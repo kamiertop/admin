@@ -3,7 +3,6 @@ package router
 import (
 	"backend/api/handler"
 	"backend/api/service"
-	"backend/dal/repo"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -11,9 +10,7 @@ import (
 func registerUser(group fiber.Router) {
 	var (
 		u = handler.User{
-			Service: service.User{
-				Repo: repo.User{},
-			},
+			Service: service.NewUser(),
 		}
 		ug = group.Group("user")
 	)
