@@ -12,10 +12,12 @@ type Config struct {
 		Mode string `toml:"mode"`
 	} `toml:"server"`
 
-	Log struct {
-		Level string `toml:"level"`
-		Path  string `toml:"path"`
-	} `toml:"log"`
+	Log Log `toml:"log"`
+}
+type Log struct {
+	Level string `toml:"level"`
+	Path  string `toml:"path"`
+	Mode  string `toml:"mode"`
 }
 
 var Cfg = new(Config)
@@ -25,6 +27,8 @@ func Init(path string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	if Cfg.Log.Mode == "" {
+		Cfg.Log.Mode = "dev"
+	}
 	return Cfg, nil
 }

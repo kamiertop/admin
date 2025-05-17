@@ -4,6 +4,9 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
+
+	"backend/config"
 
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
@@ -13,49 +16,52 @@ import (
 
 var Logger = new(zap.Logger)
 
-func Init() {
-	zap.New(zapcore.NewCore(
-		encoder(), writers(), level()),
+func Init(cfg config.Log) *zap.Logger {
+	Logger = zap.New(zapcore.NewCore(
+		encoder(cfg.Mode), writers(cfg.Mode), level(cfg.Level)),
 		zap.AddCaller(),
 		zap.AddCallerSkip(0),
 	)
+
+	return Logger
 }
 
-func writers() zapcore.WriteSyncer {
-	ws := []zapcore.WriteSyncer{
-		zapcore.AddSync(fileWriter()),
+func writers(mode string) zapcore.WriteSyncer {
+	mode = strings.ToLower(mode)
+	if mode == "development" || mode == "dev" {
+		return os.Stdout
+	} else {
+		return zapcore.AddSync(fileWriter())
 	}
-
-	ws = append(ws, zapcore.AddSync(os.Stdout))
-
-	return zapcore.NewMultiWriteSyncer(ws...)
 }
 
 func fileWriter() io.Writer {
 	return &lumberjack.Logger{}
 }
 
-func level() zap.AtomicLevel {
-	l := zap.NewAtomicLevel() // default level is InfoLevel
-	switch strings.ToLower("config.Conf.Log.Level") {
+func level(level string) zapcore.Level {
+	var l zapcore.Level
+	switch strings.ToLower(level) {
 	case "debug":
-		l.SetLevel(zapcore.DebugLevel)
+		l = zapcore.DebugLevel
 	case "info":
-		l.SetLevel(zapcore.InfoLevel)
+		l = zapcore.InfoLevel
 	case "warn":
-		l.SetLevel(zapcore.WarnLevel)
+		l = zapcore.WarnLevel
 	case "error":
-		l.SetLevel(zapcore.ErrorLevel)
+		l = zapcore.ErrorLevel
 	case "panic":
-		l.SetLevel(zapcore.PanicLevel)
+		l = zapcore.PanicLevel
+	case "fatal":
+		l = zapcore.FatalLevel
 	default:
-		l.SetLevel(zapcore.InfoLevel)
+		l = zapcore.InfoLevel
 	}
 
 	return l
 }
 
-func encoder() zapcore.Encoder {
+func encoder(mode string) zapcore.Encoder {
 	conf := zapcore.EncoderConfig{
 		TimeKey:        "time",
 		LevelKey:       "level",
@@ -73,13 +79,13 @@ func encoder() zapcore.Encoder {
 			return json.NewEncoder(writer)
 		},
 	}
-
-	//if config.Conf.System.Env == consts.DevelopmentMode {
-	//	conf.EncodeLevel = zapcore.LowercaseColorLevelEncoder
-	//	conf.ConsoleSeparator = " "
-	//	conf.EncodeTime = zapcore.TimeEncoderOfLayout(time.DateTime)
-	//	return zapcore.NewConsoleEncoder(conf)
-	//}
-
-	return zapcore.NewJSONEncoder(conf)
+	mode = strings.ToLower(mode)
+	if mode == "development" || mode == "dev" {
+		conf.EncodeLevel = zapcore.LowercaseColorLevelEncoder
+		conf.ConsoleSeparator = " "
+		conf.EncodeTime = zapcore.TimeEncoderOfLayout(time.DateTime)
+		return zapcore.NewConsoleEncoder(conf)
+	} else {
+		return zapcore.NewJSONEncoder(conf)
+	}
 }
