@@ -17,22 +17,22 @@ import (
 var Logger = new(zap.Logger)
 
 func Init(cfg config.Log) *zap.Logger {
-	Logger = zap.New(zapcore.NewCore(
-		encoder(cfg.Mode), writers(cfg.Mode), level(cfg.Level)),
+	cfg.Mode = strings.ToLower(cfg.Mode)
+
+	var writer zapcore.WriteSyncer
+
+	if cfg.Mode == "development" || cfg.Mode == "dev" {
+		writer = os.Stdout
+	} else {
+		writer = zapcore.AddSync(fileWriter())
+	}
+
+	Logger = zap.New(zapcore.NewCore(encoder(cfg.Mode), writer, level(cfg.Level)),
 		zap.AddCaller(),
 		zap.AddCallerSkip(0),
 	)
 
 	return Logger
-}
-
-func writers(mode string) zapcore.WriteSyncer {
-	mode = strings.ToLower(mode)
-	if mode == "development" || mode == "dev" {
-		return os.Stdout
-	}
-
-	return zapcore.AddSync(fileWriter())
 }
 
 func fileWriter() io.Writer {

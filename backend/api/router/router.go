@@ -22,10 +22,12 @@ func Serve(addr string) error {
 	// 注册路由
 	registerRoute(app)
 
+	const maxWaitTimeout = 5 * time.Second
+
 	return app.Listen(addr, fiber.ListenConfig{
 		// 使用context.WithCancel + signal实现优雅关机, 而不是使用app.Shutdown()
 		GracefulContext:       shutdownCtx(),
-		ShutdownTimeout:       5 * time.Second,
+		ShutdownTimeout:       maxWaitTimeout,
 		DisableStartupMessage: true,
 		EnablePrefork:         false,
 		EnablePrintRoutes:     false,

@@ -107,7 +107,10 @@ linters:
     - gochecknoglobals
     - varnamelen
     - depguard
-#  settings:
+  settings:
+    ireturn:
+      reject:
+        - "empty"
   exclusions:
     generated: lax
     warn-unused: true
