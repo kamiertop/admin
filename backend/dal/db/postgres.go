@@ -19,7 +19,7 @@ func InitPostgres(url string) (err error) {
 	return DB.Ping(ctx)
 }
 
-// customSearchPath 手动设置搜索路径
+// customSearchPath 手动设置多个搜索路径
 func customSearchPath(url string, schemas []string) error {
 	ctx := context.Background()
 	config, err := pgxpool.ParseConfig(url)

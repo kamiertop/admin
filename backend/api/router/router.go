@@ -34,7 +34,8 @@ func Serve(addr string) error {
 func shutdownCtx() context.Context {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	exitCh := make(chan os.Signal, 1)
-	signal.Notify(exitCh, syscall.SIGINT, syscall.SIGKILL)
+	// ctrl+c , kill
+	signal.Notify(exitCh, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-exitCh
 		cancelFunc()
