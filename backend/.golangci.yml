@@ -107,7 +107,7 @@ linters:
     - gochecknoglobals
     - varnamelen
     - depguard
-  settings:
+#  settings:
   exclusions:
     generated: lax
     warn-unused: true
@@ -159,7 +159,7 @@ formatters:
   exclusions:
     warn-unused: false
     generated: strict
-    paths:
+#    paths:
 
 issues:
   max-issues-per-linter: 0 # 0表示不限制
