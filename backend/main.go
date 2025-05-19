@@ -17,6 +17,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	logger := log.Init(cfg.Log)
 
 	if err := db.InitPostgres(cfg.Postgres.URL); err != nil {

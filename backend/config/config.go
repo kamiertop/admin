@@ -27,8 +27,10 @@ func Init(path string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	if Cfg.Log.Mode == "" {
 		Cfg.Log.Mode = "dev"
 	}
+
 	return Cfg, nil
 }
