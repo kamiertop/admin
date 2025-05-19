@@ -1,9 +1,12 @@
-import type {JSX} from 'solid-js'
+import {Route, Router} from "@solidjs/router"
+import NotFound from "./pages/NotFound.tsx";
 
-export default function App():JSX.Element {
+
+export default function App() {
     return (
-        <div>
-
-        </div>
+        <Router>
+            <Route path={"/"}/>
+            <Route path={"*404"} component={NotFound}/>
+        </Router>
     )
 }
