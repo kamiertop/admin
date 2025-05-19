@@ -1,0 +1,247 @@
+version: "2"
+linters:
+  default: none
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - decorder
+    - dogsled
+    - dupl
+    - dupword
+    - durationcheck
+    - err113
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exptostd
+    - fatcontext
+    - forbidigo
+    - forcetypeassert
+    - funcorder
+    - funlen
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - godox
+    - goheader
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - govet
+    - grouper
+    - iface
+    - importas
+    - inamedparam
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - ireturn
+    - lll
+    - loggercheck
+    - maintidx
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - nlreturn
+    - noctx
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - tagalign
+    - tagliatelle
+    - testableexamples
+    - testifylint
+    - testpackage
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - usetesting
+    - wastedassign
+    - whitespace
+    - wsl
+    - zerologlint
+  disable:
+    - wrapcheck
+    - exhaustruct
+    - gochecknoglobals
+    - varnamelen
+    - depguard
+  settings:
+  exclusions:
+    generated: lax
+    warn-unused: true
+    presets:
+      - comments
+      - std-error-handling
+      - common-false-positives
+      - legacy
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+    - golines
+  settings:
+    gci:
+      sections:
+        - standard       # 标准库，如 "fmt", "net/http"
+        - default        # 无法匹配其他类型的包
+        - prefix(backend)  # 自定义前缀：你的组织或仓库名（将这些视为一组）
+        - blank          # 空导入，例如 `_ "net/http/pprof"`
+        - dot            # 点导入，例如 `. "github.com/foo/bar"`
+        - alias          # 起别名的导入，例如 foo "github.com/foo/bar"`
+        - localmodule    # 当前项目内部的本地包，如 "yourmodule/utils"
+      no-inline-comments: true  # 禁止在行末写注释
+      no-prefix-comments: true  # 禁止在行首写注释
+      custom-order: true        # 允许自定义顺序
+#      no-lex-order: true
+    gofmt:
+      simplify: false
+      rewrite-rules:
+        - pattern: 'interface{}'
+          replacement: 'any'
+        - pattern: 'a[b:len(a)]'
+          replacement: 'a[b:]'
+    gofumpt:
+      module-path: backend
+      extra-rules: true
+    goimports:
+      local-prefixes:
+        - backend
+    golines:
+      max-len: 200
+      tab-len: 8
+      shorten-comments: true  #将过长的单行注释断行
+      reformat-tags: false
+      chain-split-dots: false
+  exclusions:
+    warn-unused: false
+    generated: strict
+    paths:
+
+issues:
+  max-issues-per-linter: 0 # 0表示不限制
+  max-same-issues: 0      # 不限制重复问题
+  uniq-by-line: false
+  new: false
+  whole-files: true
+  fix: true
+
+# Output configuration options.
+output:
+  formats:
+    text:
+      path: stdout
+      print-linter-name: true  # 显示linter name
+      print-issued-lines: true # 输出对应源代码
+      colors: true
+    # Prints issues in a JSON representation.
+#    json:
+#      # Output path can be either `stdout`, `stderr` or path to the file to write to.
+#      # Default: stdout
+#      path: ./path/to/output.json
+#    # Prints issues in columns representation separated by tabulations.
+#    tab:
+#      # Output path can be either `stdout`, `stderr` or path to the file to write to.
+#      # Default: stdout
+#      path: ./path/to/output.txt
+#      # Print linter name in the end of issue text.
+#      # Default: true
+#      print-linter-name: true
+#      # Use colors.
+#      # Default: true
+#      colors: false
+#    # Prints issues in an HTML page.
+#    # It uses the Cloudflare CDN (cdnjs) and React.
+#    html:
+#      # Output path can be either `stdout`, `stderr` or path to the file to write to.
+#      # Default: stdout
+#      path: ./path/to/output.html
+#    # Prints issues in the Checkstyle format.
+#    checkstyle:
+#      # Output path can be either `stdout`, `stderr` or path to the file to write to.
+#      # Default: stdout
+#      path: ./path/to/output.xml
+#    # Prints issues in the Code Climate format.
+#    code-climate:
+#      # Output path can be either `stdout`, `stderr` or path to the file to write to.
+#      # Default: stdout
+#      path: ./path/to/output.json
+#    # Prints issues in the JUnit XML format.
+#    junit-xml:
+#      # Output path can be either `stdout`, `stderr` or path to the file to write to.
+#      # Default: stdout
+#      path: ./path/to/output.xml
+#      # Support extra JUnit XML fields.
+#      # Default: false
+#      extended: true
+#    # Prints issues in the TeamCity format.
+#    teamcity:
+#      # Output path can be either `stdout`, `stderr` or path to the file to write to.
+#      # Default: stdout
+#      path: ./path/to/output.txt
+#    # Prints issues in the SARIF format.
+#    sarif:
+#      # Output path can be either `stdout`, `stderr` or path to the file to write to.
+#      # Default: stdout
+#      path: ./path/to/output.json
+#  path-prefix: ""
+#  path-mode: "abs"
+  sort-order:
+    - linter
+    - severity
+    - file # filepath, line, and column.
+  show-stats: true # Show statistics per linter.
+
+run:
+  timeout: 5m
+  relative-path-mode: gomod
+  issues-exit-code: 2
+  tests: false
+  allow-parallel-runners: true
+  allow-serial-runners: true
+  modules-download-mode: readonly
+
+

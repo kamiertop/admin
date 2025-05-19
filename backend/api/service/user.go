@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"backend/dal/db"
 	"backend/dal/model"
 	"backend/dal/repo"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type User struct {

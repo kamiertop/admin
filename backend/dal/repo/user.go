@@ -3,9 +3,9 @@ package repo
 import (
 	"context"
 
-	"backend/dal/model"
-
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"backend/dal/model"
 )
 
 type User struct{}

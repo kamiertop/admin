@@ -1,0 +1,19 @@
+name: "Go lint"
+
+on:
+  push:
+    paths:
+      - "backend/**"
+jobs:
+  golangci_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.1
+          working-directory: backend

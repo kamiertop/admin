@@ -31,11 +31,13 @@ func Serve(addr string) error {
 		EnablePrintRoutes:     false,
 	})
 }
+
 func shutdownCtx() context.Context {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	exitCh := make(chan os.Signal, 1)
 	// ctrl+c , kill
 	signal.Notify(exitCh, syscall.SIGINT, syscall.SIGTERM)
+
 	go func() {
 		<-exitCh
 		cancelFunc()
@@ -48,6 +50,7 @@ func registerRoute(app *fiber.App) {
 	app.Get("/ping", func(ctx fiber.Ctx) error {
 		return ctx.SendString("pong")
 	})
+
 	rootGroup := app.Group("")
 
 	registerUser(rootGroup)

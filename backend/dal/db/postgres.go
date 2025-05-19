@@ -23,8 +23,8 @@ func InitPostgres(url string) error {
 	return DB.Ping(ctx)
 }
 
-// CustomSearchPath 手动设置多个搜索路径.
-func CustomSearchPath(url string, schemas []string) error {
+// customSearchPath 手动设置多个搜索路径.
+func customSearchPath(url string, schemas []string) error { //nolint:unused
 	ctx := context.Background()
 
 	config, err := pgxpool.ParseConfig(url)

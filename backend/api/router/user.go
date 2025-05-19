@@ -1,10 +1,10 @@
 package router
 
 import (
+	"github.com/gofiber/fiber/v3"
+
 	"backend/api/handler"
 	"backend/api/service"
-
-	"github.com/gofiber/fiber/v3"
 )
 
 func registerUser(group fiber.Router) {

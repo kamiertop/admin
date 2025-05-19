@@ -6,12 +6,12 @@ import (
 	"strings"
 	"time"
 
-	"backend/config"
-
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+
+	"backend/config"
 )
 
 var Logger = new(zap.Logger)
@@ -30,9 +30,9 @@ func writers(mode string) zapcore.WriteSyncer {
 	mode = strings.ToLower(mode)
 	if mode == "development" || mode == "dev" {
 		return os.Stdout
-	} else {
-		return zapcore.AddSync(fileWriter())
 	}
+
+	return zapcore.AddSync(fileWriter())
 }
 
 func fileWriter() io.Writer {
@@ -41,6 +41,7 @@ func fileWriter() io.Writer {
 
 func level(level string) zapcore.Level {
 	var l zapcore.Level
+
 	switch strings.ToLower(level) {
 	case "debug":
 		l = zapcore.DebugLevel
@@ -80,12 +81,14 @@ func encoder(mode string) zapcore.Encoder {
 		},
 	}
 	mode = strings.ToLower(mode)
+
 	if mode == "development" || mode == "dev" {
 		conf.EncodeLevel = zapcore.LowercaseColorLevelEncoder
 		conf.ConsoleSeparator = " "
 		conf.EncodeTime = zapcore.TimeEncoderOfLayout(time.DateTime)
+
 		return zapcore.NewConsoleEncoder(conf)
-	} else {
-		return zapcore.NewJSONEncoder(conf)
 	}
+
+	return zapcore.NewJSONEncoder(conf)
 }
