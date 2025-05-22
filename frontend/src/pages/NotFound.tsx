@@ -1,14 +1,13 @@
-import {A} from "@solidjs/router";
 import {JSX} from "solid-js";
 
 
 export default function NotFound(): JSX.Element {
     return (
-        <div>
+        <div class="font-extrabold">
             <h1>404NotFound</h1>
-            <A href="/">
-                Go Home
-            </A>
+            {/*<A href="/">*/}
+            {/*    Go Home*/}
+            {/*</A>*/}
         </div>
     )
 }
