@@ -4,19 +4,37 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/pprof"
 )
+
+type structValidator struct {
+	validate *validator.Validate
+}
+
+func (v structValidator) Validate(out any) error {
+	return v.validate.Struct(out)
+}
+
+func newValidator() structValidator {
+	return structValidator{
+		validate: validator.New(),
+	}
+}
 
 func Serve(addr string) error {
 	app := fiber.New(fiber.Config{
-		AppName:      "admin",
-		ServerHeader: "Fiber",
-		JSONEncoder:  json.Marshal,
-		JSONDecoder:  json.Unmarshal,
+		AppName:         "admin",
+		ServerHeader:    "Fiber",
+		JSONEncoder:     json.Marshal,
+		JSONDecoder:     json.Unmarshal,
+		StructValidator: newValidator(),
 	})
 
 	// 注册路由
@@ -49,6 +67,12 @@ func shutdownCtx() context.Context {
 }
 
 func registerRoute(app *fiber.App) {
+	app.Use(pprof.New(pprof.Config{
+		Next: func(ctx fiber.Ctx) bool {
+			return !strings.HasPrefix(ctx.Path(), "admin")
+		},
+	}))
+
 	app.Get("/ping", func(ctx fiber.Ctx) error {
 		return ctx.SendString("pong")
 	})

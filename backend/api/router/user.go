@@ -15,6 +15,7 @@ func registerUser(group fiber.Router) {
 		ug = group.Group("user")
 	)
 
-	ug.Post("/", u.Create)
+	ug.Post("/register", u.Register)
 	ug.Delete("/", u.Delete)
+	ug.Post("/login", u.Login)
 }
