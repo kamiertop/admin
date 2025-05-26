@@ -26,7 +26,7 @@ func main() {
 
 	logger.Info("connect postgres success")
 
-	if err := router.Serve(cfg.Server.Addr); err != nil {
+	if err := router.Serve(cfg.Server.Addr, logger); err != nil {
 		panic(err)
 	}
 }

@@ -3,12 +3,13 @@ package service
 import (
 	"context"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
+
 	"backend/dal/db"
 	"backend/dal/model"
 	"backend/dal/repo"
-
-	"github.com/jackc/pgx/v5/pgxpool"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -16,10 +17,12 @@ type User struct {
 	db   *pgxpool.Pool
 }
 
-func NewUser() User {
+func NewUser(logger *zap.Logger) User {
 	return User{
-		Repo: repo.User{},
-		db:   db.DB,
+		Repo: repo.User{
+			Logger: logger,
+		},
+		db: db.DB,
 	}
 }
 
@@ -32,6 +35,7 @@ func (u User) Register(ctx context.Context, user model.User) (uint32, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	user.Password = string(res)
 
 	return u.Repo.Register(ctx, u.db, user)
@@ -44,4 +48,8 @@ func (u User) Login(ctx context.Context, username, password string) error {
 	}
 
 	return bcrypt.CompareHashAndPassword([]byte(pwd), []byte(password))
+}
+
+func (u User) List(ctx context.Context, limit, offset int) (int, []model.User, error) {
+	return u.Repo.List(ctx, u.db, limit, offset)
 }

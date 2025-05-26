@@ -11,7 +11,12 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/pprof"
+	"github.com/gofiber/fiber/v3/middleware/recover"
+	"go.uber.org/zap"
+
+	"backend/common/middleware"
 )
 
 type structValidator struct {
@@ -28,17 +33,18 @@ func newValidator() structValidator {
 	}
 }
 
-func Serve(addr string) error {
+func Serve(addr string, logger *zap.Logger) error {
 	app := fiber.New(fiber.Config{
 		AppName:         "admin",
 		ServerHeader:    "Fiber",
 		JSONEncoder:     json.Marshal,
 		JSONDecoder:     json.Unmarshal,
 		StructValidator: newValidator(),
+		ErrorHandler:    middleware.ErrorHandler,
 	})
 
 	// 注册路由
-	registerRoute(app)
+	registerRoute(app, logger)
 
 	const maxWaitTimeout = 5 * time.Second
 
@@ -66,11 +72,17 @@ func shutdownCtx() context.Context {
 	return ctx
 }
 
-func registerRoute(app *fiber.App) {
+func registerRoute(app *fiber.App, logger *zap.Logger) {
+	app.Use(recover.New(recover.Config{EnableStackTrace: true}))
+	app.Use(middleware.Logger(logger))
 	app.Use(pprof.New(pprof.Config{
 		Next: func(ctx fiber.Ctx) bool {
 			return !strings.HasPrefix(ctx.Path(), "admin")
 		},
+	}))
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST", "HEAD", "PUT", "DELETE", "PATCH"},
 	}))
 
 	app.Get("/ping", func(ctx fiber.Ctx) error {
@@ -79,5 +91,5 @@ func registerRoute(app *fiber.App) {
 
 	rootGroup := app.Group("")
 
-	registerUser(rootGroup)
+	registerUser(rootGroup, logger)
 }

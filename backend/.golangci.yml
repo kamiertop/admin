@@ -111,6 +111,13 @@ linters:
     ireturn:
       reject:
         - "empty"
+    gosmopolitan:
+      allow-time-local: true
+      #  不检查中文
+      watch-for-scripts:
+        - Devanagari
+        - Hangul
+
   exclusions:
     generated: lax
     warn-unused: true
@@ -119,6 +126,7 @@ linters:
       - std-error-handling
       - common-false-positives
       - legacy
+
 formatters:
   enable:
     - gci
