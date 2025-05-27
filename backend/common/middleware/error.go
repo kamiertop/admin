@@ -3,31 +3,21 @@ package middleware
 import (
 	"errors"
 
+	"backend/common/errcode"
+
 	"github.com/gofiber/fiber/v3"
 )
 
 func ErrorHandler(ctx fiber.Ctx, err error) error {
-	if err == nil {
-		return nil
-	}
-
-	var (
-		e    *fiber.Error
-		code = fiber.StatusInternalServerError
-		msg  = "后端开发同学写了bug😡"
-	)
+	var e *errcode.AppError
 
 	if errors.As(err, &e) {
-		code = e.Code
+		return ctx.Status(e.Code).JSON(fiber.Map{
+			"msg": e.Msg,
+		})
 	}
 
-	if code == fiber.StatusBadRequest {
-		msg = "参数有误😲"
-	}
-
-	if code == fiber.StatusInternalServerError {
-		msg = "服务器开小差啦😳"
-	}
-
-	return ctx.Status(code).SendString(msg)
+	return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+		"msg": "后端同学写了bug~",
+	})
 }

@@ -1,11 +1,15 @@
 package handler
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/jackc/pgx/v5"
+	"golang.org/x/crypto/bcrypt"
 
 	"backend/api/service"
+	"backend/common/errcode"
 	"backend/dal/model"
 )
 
@@ -23,11 +27,11 @@ func (u User) Delete(ctx fiber.Ctx) error {
 	)
 
 	if err = ctx.Bind().JSON(&req); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		return errcode.NewBadRequestError(err)
 	}
 
 	if err = u.Service.Delete(ctx.Context(), req.IDs); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		return errcode.NewInternalError(err)
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(nil)
@@ -37,12 +41,12 @@ func (u User) Delete(ctx fiber.Ctx) error {
 func (u User) Register(ctx fiber.Ctx) error {
 	var user model.User
 	if err := ctx.Bind().JSON(&user); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		return errcode.NewBadRequestError(err)
 	}
 
 	id, err := u.Service.Register(ctx.Context(), user)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		return errcode.NewInternalError(err)
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -65,16 +69,24 @@ func (u User) Login(ctx fiber.Ctx) error {
 	}
 
 	if err = u.Service.Login(ctx.Context(), req.Username, req.Password); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		if errors.Is(err, pgx.ErrNoRows) {
+			return errcode.NewError(fiber.StatusUnauthorized, "用户不存在", err)
+		}
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return errcode.NewError(fiber.StatusUnauthorized, "密码错误", err)
+		}
+		return errcode.NewInternalError(err)
 	}
 
-	return ctx.Status(fiber.StatusCreated).JSON(nil)
+	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"msg": "success",
+	})
 }
 
 func (u User) List(ctx fiber.Ctx) error {
 	limit, err := strconv.Atoi(ctx.Query("page_size"))
 	if err != nil {
-		return fiber.ErrBadRequest
+		return errcode.NewBadRequestError(err)
 	}
 
 	if limit == 0 {
@@ -83,7 +95,7 @@ func (u User) List(ctx fiber.Ctx) error {
 
 	page, err := strconv.Atoi(ctx.Query("page"))
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		return errcode.NewBadRequestError(err)
 	}
 
 	if page <= 0 {
@@ -94,7 +106,7 @@ func (u User) List(ctx fiber.Ctx) error {
 
 	count, list, err := u.Service.List(ctx.Context(), limit, offset)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		return errcode.NewInternalError(err)
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
