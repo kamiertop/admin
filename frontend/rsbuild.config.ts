@@ -11,5 +11,8 @@ export default defineConfig({
     ],
     html: {
         title: "admin"
+    },
+    server: {
+        port: 8080
     }
 });
