@@ -3,15 +3,15 @@ package config
 import "github.com/BurntSushi/toml"
 
 type Config struct {
-	Postgres struct {
-		URL string `toml:"url"`
-	} `toml:"postgres"`
-
 	Server struct {
 		Addr string `toml:"addr"`
 		Mode string `toml:"mode"`
 	} `toml:"server"`
-
+	DuckDB struct {
+		FilePath    string `toml:"file_path"`
+		MaxIdleConn int    `toml:"max_idle_conn"`
+		MaxOpenConn int    `toml:"max_open_conn"`
+	} `toml:"duckdb"`
 	Log Log `toml:"log"`
 }
 type Log struct {

@@ -1,0 +1,26 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=GoLand
+
+###
+POST http://localhost:8080/user/register
+Content-Type: application/json
+
+{
+  "name": "xl",
+  "password": "123456",
+  "email": "762610973@qq.com",
+  "gender": "男"
+}
+
+###
+POST http://localhost:8080/user/login
+Content-Type: application/json
+
+{
+  "username": "xl",
+  "password": "1234561"
+}
+
+###
+GET http://localhost:8080/user/?page=1&page_size=10

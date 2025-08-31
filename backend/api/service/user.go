@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 
@@ -14,7 +14,7 @@ import (
 
 type User struct {
 	Repo repo.User
-	db   *pgxpool.Pool
+	db   *sqlx.DB
 }
 
 func NewUser(logger *zap.Logger) User {
