@@ -1,11 +1,11 @@
 package handler
 
 import (
+	"database/sql"
 	"errors"
 	"strconv"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/jackc/pgx/v5"
 	"golang.org/x/crypto/bcrypt"
 
 	"backend/api/service"
@@ -30,11 +30,13 @@ func (u User) Delete(ctx fiber.Ctx) error {
 		return errcode.NewBadRequestError(err)
 	}
 
-	if err = u.Service.Delete(ctx.Context(), req.IDs); err != nil {
+	if err = u.Service.Delete(req.IDs); err != nil {
 		return errcode.NewInternalError(err)
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(nil)
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"msg": "ok",
+	})
 }
 
 // Register 用户注册.
@@ -44,7 +46,7 @@ func (u User) Register(ctx fiber.Ctx) error {
 		return errcode.NewBadRequestError(err)
 	}
 
-	id, err := u.Service.Register(ctx.Context(), user)
+	id, err := u.Service.Register(user)
 	if err != nil {
 		return errcode.NewInternalError(err)
 	}
@@ -68,8 +70,8 @@ func (u User) Login(ctx fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	if err = u.Service.Login(ctx.Context(), req.Username, req.Password); err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
+	if err = u.Service.Login(req.Username, req.Password); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
 			return errcode.NewError(fiber.StatusUnauthorized, "用户不存在", err)
 		}
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
@@ -104,7 +106,7 @@ func (u User) List(ctx fiber.Ctx) error {
 
 	offset := (page - 1) * limit
 
-	count, list, err := u.Service.List(ctx.Context(), limit, offset)
+	count, list, err := u.Service.List(limit, offset)
 	if err != nil {
 		return errcode.NewInternalError(err)
 	}

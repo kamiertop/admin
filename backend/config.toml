@@ -1,5 +1,5 @@
-[duckdb]
-file_path = "./duck.db"
+[sqlite]
+file_path = "./sqlite.db"
 max_open_conn = 20
 max_idle_conn = 20
 [server]

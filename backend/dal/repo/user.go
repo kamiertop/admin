@@ -1,47 +1,44 @@
 package repo
 
 import (
-	"context"
+	"backend/dal/model"
 
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
-
-	"backend/dal/model"
 )
 
 type User struct {
 	Logger *zap.Logger
 }
 
-func (User) Delete(ctx context.Context, db *sqlx.DB, ids []int) error {
-	if _, err := db.ExecContext(ctx, "DELETE FROM users WHERE id = ANY($1)", ids); err != nil {
-		return err
-	}
+func (User) Delete(db *sqlx.DB, ids []int) error {
+	_, err := onlyIn(db, "DELETE FROM users WHERE id in (?)", ids)
 
-	return nil
+	return err
 }
 
-func (User) Register(ctx context.Context, db *sqlx.DB, user model.User) (uint32, error) {
-	if err := db.QueryRowContext(ctx,
-		"INSERT INTO users (email, gender, name, password) VALUES ($1, $2, $3, $4) RETURNING id",
+func (User) Register(db *sqlx.DB, user model.User) (uint32, error) {
+	if err := db.QueryRow(
+		"INSERT INTO users (email, gender, name, password) VALUES (?, ?, ?, ?) RETURNING id",
 		user.Email, user.Gender, user.Name, user.Password).
 		Scan(&user.ID); err != nil {
+
 		return 0, err
 	}
 
 	return user.ID, nil
 }
 
-func (u User) Login(ctx context.Context, db *sqlx.DB, username string) (string, error) {
+func (u User) Login(db *sqlx.DB, username string) (string, error) {
 	var password string
-	if err := db.QueryRowContext(ctx, "SELECT password FROM users WHERE name = $1", username).Scan(&password); err != nil {
+	if err := db.QueryRow("SELECT password FROM users WHERE name = ?", username).Scan(&password); err != nil {
 		return "", err
 	}
 
 	return password, nil
 }
 
-func (u User) List(ctx context.Context, db *sqlx.DB, limit, offset int) (int, []model.User, error) {
+func (u User) List(db *sqlx.DB, limit, offset int) (int, []model.User, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return 0, nil, err
@@ -73,7 +70,7 @@ func (u User) List(ctx context.Context, db *sqlx.DB, limit, offset int) (int, []
 	}
 
 	var count int
-	if err = tx.QueryRowContext(ctx, "SELECT count(id) FROM users").Scan(&count); err != nil {
+	if err = tx.QueryRow("SELECT count(id) FROM users").Scan(&count); err != nil {
 		return 0, nil, err
 	}
 

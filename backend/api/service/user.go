@@ -1,8 +1,6 @@
 package service
 
 import (
-	"context"
-
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
@@ -26,11 +24,11 @@ func NewUser(logger *zap.Logger) User {
 	}
 }
 
-func (u User) Delete(ctx context.Context, ids []int) error {
-	return u.Repo.Delete(ctx, u.db, ids)
+func (u User) Delete(ids []int) error {
+	return u.Repo.Delete(u.db, ids)
 }
 
-func (u User) Register(ctx context.Context, user model.User) (uint32, error) {
+func (u User) Register(user model.User) (uint32, error) {
 	res, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return 0, err
@@ -38,11 +36,11 @@ func (u User) Register(ctx context.Context, user model.User) (uint32, error) {
 
 	user.Password = string(res)
 
-	return u.Repo.Register(ctx, u.db, user)
+	return u.Repo.Register(u.db, user)
 }
 
-func (u User) Login(ctx context.Context, username, password string) error {
-	pwd, err := u.Repo.Login(ctx, u.db, username)
+func (u User) Login(username, password string) error {
+	pwd, err := u.Repo.Login(u.db, username)
 	if err != nil {
 		return err
 	}
@@ -50,6 +48,6 @@ func (u User) Login(ctx context.Context, username, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(pwd), []byte(password))
 }
 
-func (u User) List(ctx context.Context, limit, offset int) (int, []model.User, error) {
-	return u.Repo.List(ctx, u.db, limit, offset)
+func (u User) List(limit, offset int) (int, []model.User, error) {
+	return u.Repo.List(u.db, limit, offset)
 }

@@ -8,12 +8,8 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// var tracer = otel.Tracer("fiber")
-
 func Logger(logger *zap.Logger) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
-		// start, span := tracer.Start(ctx.Context(), ctx.Method()+" "+ctx.Path())
-		// defer span.End()
 		s := time.Now()
 		err := ctx.Next()
 		msg := []zapcore.Field{

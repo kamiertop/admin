@@ -7,11 +7,11 @@ type Config struct {
 		Addr string `toml:"addr"`
 		Mode string `toml:"mode"`
 	} `toml:"server"`
-	DuckDB struct {
+	Sqlite struct {
 		FilePath    string `toml:"file_path"`
 		MaxIdleConn int    `toml:"max_idle_conn"`
 		MaxOpenConn int    `toml:"max_open_conn"`
-	} `toml:"duckdb"`
+	} `toml:"sqlite"`
 	Log Log `toml:"log"`
 }
 type Log struct {

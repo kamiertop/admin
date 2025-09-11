@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	configPath := flag.String("config", "config.toml", "config file path, default is .")
+	configPath := flag.String("config", "config.toml", "config file path, default is ./config.toml")
 	flag.Parse()
 
 	cfg, err := config.Init(*configPath)
@@ -20,13 +20,10 @@ func main() {
 
 	logger := log.Init(cfg.Log)
 
-	if duckDB, err := db.InitDuckDB(cfg.DuckDB.FilePath); err != nil {
+	if _, err := db.InitSqlite(cfg.Sqlite.FilePath, cfg.Sqlite.MaxIdleConn, cfg.Sqlite.MaxOpenConn); err != nil {
 		panic(err)
-	} else {
-		_ = duckDB
 	}
-
-	logger.Info("connect duckdb success")
+	logger.Info("connect sqlite3 success")
 
 	if err := router.Serve(cfg.Server.Addr, logger); err != nil {
 		panic(err)
